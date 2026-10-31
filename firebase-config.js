@@ -11,7 +11,7 @@ window.FIREBASE_CONFIG = {
 
 // Email IDs that can open admin.html and see all users and attempts.
 // Must also be listed in firestore.rules (isAdmin function).
-window.ADMIN_EMAILS = ["PASTE_ADMIN_EMAIL@gmail.com"];
+window.ADMIN_EMAILS = ["sandeepjansevakendra.unnao@gmail.com"];
 
 window.SITE_CREDIT = {
   name: "Sandeep Kumar",
