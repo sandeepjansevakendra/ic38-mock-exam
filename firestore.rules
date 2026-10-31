@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Same email as ADMIN_EMAILS in firebase-config.js
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ['PASTE_ADMIN_EMAIL@gmail.com'];
+    }
+    function signedIn() { return request.auth != null; }
+
+    // Sheet 1: one row per user (name, mobile, email, DOB)
+    match /users/{uid} {
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.mobile is string
+        && request.resource.data.mobile.matches('^[6-9][0-9]{9}$');
+      allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
+      // users may only touch activity fields, never name/mobile/email/DOB
+      allow update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['lastLogin', 'emailVerified', 'attempts', 'lastScore', 'lastSet', 'bestScore', 'lastAttemptAt']);
+      allow delete: if false;
+    }
+
+    // Sheet 2: every test attempt, added one after another
+    match /attempts/{id} {
+      allow create: if signedIn()
+        && request.auth.token.email_verified == true
+        && request.resource.data.uid == request.auth.uid;
+      allow read: if (signedIn() && resource.data.uid == request.auth.uid) || isAdmin();
+      allow update, delete: if false;
+    }
+
+    // One mobile number = one account (create fails if number already used)
+    match /mobiles/{mobile} {
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+  }
+}

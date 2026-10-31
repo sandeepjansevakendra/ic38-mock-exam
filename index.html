@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IC-38 Mock Exam</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="IC-38 Life Insurance Agent mock exam — 25 timed sets of 50 questions in Hindi">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: exam-hall console — navy candidate bar on top, question pane left, status palette right (drawer on phones) */
+:root{
+  --bg:#eef2f6; --surface:#ffffff; --surface-2:#f6f8fb; --ink:#16202e; --muted:#5a6678; --line:#d5dce5;
+  --brand:#173a63; --brand-2:#22508a; --brand-ink:#ffffff; --accent:#d99a1e; --accent-soft:#fbf1dc;
+  --ok:#1f8a4c; --ok-soft:#e3f4ea; --bad:#c8372d; --bad-soft:#fbe7e5; --rev:#6b3fa0; --rev-soft:#efe7f8; --nv:#c9d1db; --nv-ink:#3b4656;
+  --sel:#e6eefa;
+  --f-body:"Mukta","Noto Sans Devanagari","Nirmala UI","Mangal",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"Consolas",monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e151e; --surface:#16202c; --surface-2:#1b2735; --ink:#e6ecf3; --muted:#9aa8b9; --line:#2b3a4b;
+  --brand:#14304f; --brand-2:#2a5c96; --brand-ink:#f2f6fb; --accent:#e9b04a; --accent-soft:#3a2f18;
+  --ok:#3fb36f; --ok-soft:#163323; --bad:#e8675d; --bad-soft:#3a1d1b; --rev:#a682d8; --rev-soft:#2a2140; --nv:#3a4757; --nv-ink:#c8d2de;
+  --sel:#1d3350; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0e151e; --surface:#16202c; --surface-2:#1b2735; --ink:#e6ecf3; --muted:#9aa8b9; --line:#2b3a4b;
+  --brand:#14304f; --brand-2:#2a5c96; --brand-ink:#f2f6fb; --accent:#e9b04a; --accent-soft:#3a2f18;
+  --ok:#3fb36f; --ok-soft:#163323; --bad:#e8675d; --bad-soft:#3a1d1b; --rev:#a682d8; --rev-soft:#2a2140; --nv:#3a4757; --nv-ink:#c8d2de;
+  --sel:#1d3350; color-scheme:dark }
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--brand)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.en{font-size:.82em;color:var(--muted);font-weight:500}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--brand);color:var(--brand-ink);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.bar .wrap{display:flex;align-items:center;gap:14px;min-height:60px;padding-block:8px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.seal{width:36px;height:36px;border-radius:50%;border:2px solid var(--accent);display:grid;place-items:center;font-weight:800;font-size:12px;color:var(--accent);flex:none;letter-spacing:.02em}
+.brand b{display:block;font-size:17px;line-height:1.15;font-weight:700}
+.brand small{display:block;font-size:12.5px;opacity:.8;line-height:1.2}
+.cand{font-size:13px;opacity:.9;text-align:right;line-height:1.25}
+.timer{display:flex;flex-direction:column;align-items:center;background:rgba(0,0,0,.22);border-radius:8px;padding:4px 12px;min-width:112px}
+.timer span{font-size:11px;opacity:.85;letter-spacing:.06em;text-transform:uppercase}
+.timer b{font-family:var(--f-mono);font-size:22px;font-variant-numeric:tabular-nums;line-height:1.1}
+.timer.warn b{color:var(--accent)}
+.timer.crit{background:var(--bad)}
+.iconbtn{background:transparent;border:1px solid rgba(255,255,255,.35);color:var(--brand-ink);border-radius:8px;padding:6px 10px;font-size:13px}
+
+/* buttons */
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:9px 14px;font-weight:600;line-height:1.2;display:inline-flex;flex-direction:column;align-items:center;gap:1px;text-align:center}
+.btn small{font-weight:500;font-size:11.5px;color:var(--muted)}
+.btn:hover{border-color:var(--brand-2)}
+.btn.primary{background:var(--brand-2);border-color:var(--brand-2);color:#fff}
+.btn.primary small{color:rgba(255,255,255,.85)}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}.btn.ok small{color:rgba(255,255,255,.85)}
+.btn.rev{background:var(--rev);border-color:var(--rev);color:#fff}.btn.rev small{color:rgba(255,255,255,.85)}
+.btn.danger{background:var(--bad);border-color:var(--bad);color:#fff}.btn.danger small{color:rgba(255,255,255,.85)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* home */
+main{padding-block:22px 48px}
+.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;align-items:stretch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.hero h1{font-size:clamp(24px,3.4vw,32px);line-height:1.2;margin:0 0 6px;text-wrap:balance}
+.hero p{margin:0;color:var(--muted);max-width:60ch}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.fact{background:var(--surface-2);border-radius:8px;padding:10px 12px}
+.fact b{display:block;font-family:var(--f-mono);font-size:20px}
+.fact span{font-size:12.5px;color:var(--muted);line-height:1.3;display:block}
+.prog h2{font-size:15px;margin:0 0 10px;font-weight:700}
+.prog .row{display:flex;justify-content:space-between;border-bottom:1px dashed var(--line);padding:7px 0;font-size:15px}
+.prog .row:last-child{border:0}
+.prog .row b{font-family:var(--f-mono)}
+.resume{margin-top:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--r);padding:12px 16px}
+.sechead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:26px 0 12px;flex-wrap:wrap}
+.sechead h2{margin:0;font-size:20px}
+.sets{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:12px}
+.setcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;text-align:left;color:var(--ink);display:flex;flex-direction:column;gap:8px;transition:border-color .15s,transform .15s}
+.setcard:hover{border-color:var(--brand-2);transform:translateY(-1px)}
+.setcard .no{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.setcard .ttl{font-weight:700;font-size:18px;line-height:1.1}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;border-radius:999px;padding:2px 10px;width:max-content}
+.pill.new{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.pill.pass{background:var(--ok-soft);color:var(--ok)}
+.pill.fail{background:var(--bad-soft);color:var(--bad)}
+.pill.live{background:var(--accent-soft);color:var(--ink);border:1px solid var(--accent)}
+.setcard .meta{font-size:12.5px;color:var(--muted)}
+
+/* instructions */
+.instr{max-width:860px;margin:0 auto}
+.instr h1{font-size:24px;margin:0 0 4px}
+.instr ol{padding-left:22px;margin:12px 0}
+.instr li{margin:6px 0}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin:12px 0}
+.legend div{display:flex;align-items:center;gap:10px;font-size:14px}
+.field{display:flex;flex-direction:column;gap:6px;margin:16px 0}
+.field label{font-weight:600}
+.field input{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);max-width:420px}
+.check{display:flex;gap:10px;align-items:flex-start;margin:14px 0;font-size:15px}
+.check input{width:20px;height:20px;margin-top:3px;flex:none}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+
+/* palette chips */
+.q{width:40px;height:38px;border-radius:7px;border:1px solid transparent;font-family:var(--f-mono);font-size:14px;font-weight:700;display:grid;place-items:center;position:relative;background:var(--nv);color:var(--nv-ink)}
+.q.na{background:var(--bad);color:#fff;border-radius:7px 7px 18px 18px}
+.q.an{background:var(--ok);color:#fff;border-radius:18px 18px 7px 7px}
+.q.mr{background:var(--rev);color:#fff;border-radius:50%}
+.q.am{background:var(--rev);color:#fff;border-radius:50%}
+.q.am::after{content:"";position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:var(--ok);border:2px solid var(--surface)}
+.q.cur{outline:3px solid var(--accent);outline-offset:1px}
+.legend .q{width:32px;height:30px;font-size:12px}
+
+/* exam */
+.exam{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;padding-block:16px 24px;align-items:start}
+.qpane{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);display:flex;flex-direction:column;min-width:0}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.qhead .qn{font-weight:700;font-size:17px}
+.qhead .tp{font-size:13px;color:var(--muted)}
+.qbody{padding:18px 18px 8px;min-width:0}
+.qtext{font-size:clamp(18px,2.1vw,21px);font-weight:600;line-height:1.5;margin:0 0 16px}
+.opts{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.opt{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:9px;padding:11px 14px;background:var(--surface);color:var(--ink);text-align:left;width:100%;font-size:17px;line-height:1.45}
+.opt:hover{border-color:var(--brand-2)}
+.opt .k{flex:none;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-family:var(--f-mono);font-size:13px;font-weight:700;color:var(--muted);margin-top:1px}
+.opt[aria-checked="true"]{border-color:var(--brand-2);background:var(--sel)}
+.opt[aria-checked="true"] .k{background:var(--brand-2);border-color:var(--brand-2);color:#fff}
+.qfoot{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;padding:14px 18px;border-top:1px solid var(--line);background:var(--surface-2);border-radius:0 0 var(--r) var(--r);margin-top:12px}
+.qfoot .grp{display:flex;gap:8px;flex-wrap:wrap}
+.side{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px)}
+.side h3{margin:0 0 8px;font-size:15px}
+.counts{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;font-size:13px;margin-bottom:12px}
+.counts div{display:flex;align-items:center;gap:8px}
+.counts .q{width:28px;height:26px;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(5,40px);gap:8px;justify-content:space-between;max-height:52vh;overflow:auto;padding:4px 2px}
+.side .btn{width:100%;margin-top:12px}
+.paltoggle{display:none}
+.scrim{display:none}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:20;background:rgba(10,18,28,.55);display:grid;place-items:center;padding:16px}
+.dialog{background:var(--surface);color:var(--ink);border-radius:12px;max-width:460px;width:100%;padding:20px;border:1px solid var(--line)}
+.dialog h3{margin:0 0 6px;font-size:20px}
+.dialog table{width:100%;border-collapse:collapse;margin:12px 0;font-size:15px}
+.dialog td{padding:6px 4px;border-bottom:1px solid var(--line)}
+.dialog td:last-child{text-align:right;font-family:var(--f-mono);font-weight:700}
+
+/* result */
+.res-top{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center}
+.score{width:150px;height:150px;border-radius:50%;display:grid;place-items:center;text-align:center;border:10px solid var(--line);position:relative}
+.score b{font-family:var(--f-mono);font-size:38px;line-height:1}
+.score span{font-size:13px;color:var(--muted)}
+.verdict{font-size:28px;font-weight:800;line-height:1.1}
+.verdict.pass{color:var(--ok)}.verdict.fail{color:var(--bad)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.stats div{background:var(--surface-2);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--muted)}
+.stats b{display:block;font-family:var(--f-mono);font-size:18px;color:var(--ink)}
+.tablewrap{overflow-x:auto}
+table.topics{width:100%;border-collapse:collapse;font-size:15px}
+table.topics th,table.topics td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+table.topics th{font-size:12.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+table.topics td.n{font-family:var(--f-mono);text-align:right;white-space:nowrap}
+.bar-mini{height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden;min-width:80px}
+.bar-mini i{display:block;height:100%;background:var(--ok)}
+.bar-mini i.low{background:var(--bad)}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--brand-2);border-color:var(--brand-2);color:#fff}
+.rv{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--nv);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.rv.ok{border-left-color:var(--ok)}.rv.bad{border-left-color:var(--bad)}
+.rv .h{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.rv .t{font-weight:600;font-size:17px}
+.rv ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.rv li{padding:6px 10px;border-radius:7px;font-size:15.5px;display:flex;gap:8px}
+.rv li.c{background:var(--ok-soft);color:var(--ink);font-weight:600}
+.rv li.w{background:var(--bad-soft)}
+.rv li .tag{margin-left:auto;font-size:12px;font-weight:700;white-space:nowrap}
+.rv li.c .tag{color:var(--ok)}.rv li.w .tag{color:var(--bad)}
+.rv .ex{font-size:14.5px;color:var(--muted);background:var(--surface-2);border-radius:7px;padding:8px 10px}
+.rvlist{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.stack{display:flex;flex-direction:column;gap:18px}
+.foot{font-size:13px;color:var(--muted);text-align:center;padding-block:10px 24px}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .exam{grid-template-columns:minmax(0,1fr)}
+  .side{position:fixed;top:0;right:0;bottom:0;width:min(330px,88vw);z-index:15;border-radius:0;transform:translateX(105%);transition:transform .2s;overflow:auto;padding-top:calc(14px + env(safe-area-inset-top,0px));padding-right:max(14px,env(safe-area-inset-right,0px));padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+  .side.open{transform:none}
+  .grid{max-height:none}
+  .scrim.open{display:block;position:fixed;inset:0;background:rgba(10,18,28,.45);z-index:14}
+  .paltoggle{display:inline-block}
+}
+@media (max-width:560px){
+  .facts{grid-template-columns:repeat(2,1fr)}
+  .cand{display:none}
+  .brand small{display:none}
+  .res-top{grid-template-columns:1fr;justify-items:start}
+  .qfoot .grp{width:100%}
+  .qfoot .grp .btn{flex:1}
+  .timer{min-width:96px}
+  .timer b{font-size:19px}
+}
+
+/* auth */
+.auth{max-width:520px;margin:0 auto}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--surface-2);border-radius:9px;padding:4px;margin-bottom:14px}
+.tab{border:0;background:transparent;color:var(--muted);border-radius:7px;padding:8px;font-weight:700}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.auth .field{margin:10px 0}
+.auth .field input{max-width:none;width:100%}
+.hint{font-size:13px;color:var(--muted)}
+.msg{border-radius:8px;padding:9px 12px;font-size:14.5px;margin:10px 0}
+.msg.err{background:var(--bad-soft);color:var(--bad)}
+.msg.ok{background:var(--ok-soft);color:var(--ok)}
+.linkbtn{background:none;border:0;color:var(--brand-2);font-weight:600;padding:0;text-decoration:underline}
+.auth .btn.primary{width:100%}
+.userchip{display:flex;align-items:center;gap:8px;font-size:13px}
+.userchip b{max-width:16ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.setup{border:1px solid var(--accent);background:var(--accent-soft);border-radius:var(--r);padding:14px 16px}
+/* credit corner */
+.credit{position:fixed;right:max(10px,env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:12;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:6px 10px;font-size:12px;line-height:1.35;color:var(--muted);box-shadow:0 2px 10px rgba(0,0,0,.12);max-width:270px}
+.credit b{color:var(--ink)}
+.credit a{color:var(--brand-2);font-weight:700;text-decoration:none;font-family:var(--f-mono)}
+body{padding-bottom:70px}
+@media (max-width:560px){.credit{left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));max-width:none;text-align:center;font-size:11.5px;padding:5px 8px}.userchip .em{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="bar" id="bar">
+  <div class="wrap">
+    <div class="brand">
+      <div class="seal">IC38</div>
+      <div><b>IC-38 मॉक परीक्षा</b><small>Life Insurance Agent · Pre-Recruitment Mock Test</small></div>
+    </div>
+    <div class="userchip" id="userChip" hidden><b id="userName"></b><button class="iconbtn" id="logoutBtn">Logout</button></div>
+    <div class="cand" id="candBox" hidden></div>
+    <button class="iconbtn paltoggle" id="palBtn" hidden aria-controls="side">Question Palette</button>
+    <div class="timer" id="timer" hidden><span>Time Left · शेष समय</span><b id="clock">60:00</b></div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<main id="auth" class="wrap" hidden>
+  <div class="panel auth">
+    <div id="setupNote" class="setup" hidden><b>Setup अधूरा है</b><div class="hint">firebase-config.js में Firebase की settings नहीं डाली गई हैं। README के स्टेप 2 देखें।</div></div>
+    <h1 style="font-size:22px;margin:4px 0 2px">IC-38 मॉक परीक्षा में आपका स्वागत है</h1>
+    <p class="hint" style="margin:0 0 14px">25 टेस्ट सेट मुफ़्त। शुरू करने के लिए लॉगिन या रजिस्टर करें।</p>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tabLogin" aria-selected="true">Login · लॉगिन</button>
+      <button class="tab" role="tab" id="tabReg" aria-selected="false">Register · नया खाता</button>
+    </div>
+    <div id="authMsg" class="msg" hidden></div>
+    <form id="loginForm" novalidate>
+      <div class="field"><label for="liEmail">ईमेल <span class="en">· Email</span></label><input id="liEmail" type="email" autocomplete="email" required placeholder="name@gmail.com"></div>
+      <div class="field"><label for="liPass">पासवर्ड <span class="en">· Password</span></label><input id="liPass" type="password" autocomplete="current-password" required placeholder="Password"></div>
+      <button class="btn primary" type="submit" id="liBtn">Login<small>लॉगिन करें</small></button>
+      <p class="hint" style="margin:10px 0 0">पासवर्ड भूल गए? <button type="button" class="linkbtn" id="forgotBtn">Reset password</button></p>
+    </form>
+    <form id="regForm" novalidate hidden>
+      <div class="field"><label for="rgName">पूरा नाम <span class="en">· Full name</span></label><input id="rgName" autocomplete="name" maxlength="60" required placeholder="Full name"></div>
+      <div class="field"><label for="rgMobile">मोबाइल नंबर <span class="en">· Mobile number</span></label><input id="rgMobile" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national" required placeholder="10-digit mobile number"></div>
+      <div class="field"><label for="rgEmail">ईमेल <span class="en">· Email (verify होगा)</span></label><input id="rgEmail" type="email" autocomplete="email" required placeholder="name@gmail.com"></div>
+      <div class="field"><label for="rgDob">जन्म तिथि <span class="en">· Date of birth</span></label><input id="rgDob" type="date" required></div>
+      <div class="field"><label for="rgPass">पासवर्ड बनाएँ <span class="en">· Password (min 6)</span></label><input id="rgPass" type="password" autocomplete="new-password" minlength="6" required placeholder="At least 6 characters"></div>
+      <label class="check"><input type="checkbox" id="rgAgree"> <span>मैं सहमत हूँ कि मेरा नाम, मोबाइल, ईमेल, जन्म तिथि और टेस्ट स्कोर Sandeep Jan Seva Kendra के पास सुरक्षित रखे जाएँगे।</span></label>
+      <button class="btn primary" type="submit" id="rgBtn">Create Account<small>खाता बनाएँ</small></button>
+    </form>
+  </div>
+</main>
+
+<!-- VERIFY EMAIL -->
+<main id="verify" class="wrap" hidden>
+  <div class="panel auth">
+    <h1 style="font-size:22px;margin:0 0 6px">ईमेल वेरीफाई करें</h1>
+    <p style="margin:0 0 8px"><b id="vEmail"></b> पर एक लिंक भेजा गया है। ईमेल खोलकर लिंक पर क्लिक करें, फिर नीचे वाला बटन दबाएँ।</p>
+    <p class="hint">ईमेल न दिखे तो Spam / Promotions फ़ोल्डर देखें।</p>
+    <div id="vMsg" class="msg" hidden></div>
+    <div class="actions">
+      <button class="btn primary" id="vCheck">I have verified<small>मैंने वेरीफाई कर लिया</small></button>
+      <button class="btn" id="vResend">Resend Email<small>दोबारा भेजें</small></button>
+      <button class="btn" id="vLogout">Logout<small>लॉगआउट</small></button>
+    </div>
+  </div>
+</main>
+
+<!-- LOADING -->
+<main id="loading" class="wrap"><div class="panel" style="max-width:520px;margin:0 auto;text-align:center;color:var(--muted)">लोड हो रहा है… · Loading…</div></main>
+
+<!-- HOME -->
+<main id="home" class="wrap" hidden>
+  <section class="hero">
+    <div class="panel">
+      <h1>25 टेस्ट सेट, असली परीक्षा जैसा माहौल</h1>
+      <p>हर सेट में 50 प्रश्न और 60 मिनट। समय पूरा होते ही पेपर अपने आप जमा हो जाएगा। ग़लत उत्तर के नंबर नहीं कटते, इसलिए कोई प्रश्न खाली न छोड़ें।</p>
+      <div class="facts">
+        <div class="fact"><b>50</b><span>प्रश्न · Questions</span></div>
+        <div class="fact"><b>60</b><span>मिनट · Minutes</span></div>
+        <div class="fact"><b>18</b><span>पास अंक (35%) · Pass mark</span></div>
+        <div class="fact"><b>0</b><span>नेगेटिव मार्किंग · Negative</span></div>
+      </div>
+    </div>
+    <div class="panel prog">
+      <h2>आपकी प्रगति <span class="en">· Your progress</span></h2>
+      <div class="row"><span>दिए गए सेट · Sets taken</span><b id="pDone">0 / 25</b></div>
+      <div class="row"><span>पास हुए · Passed</span><b id="pPass">0</b></div>
+      <div class="row"><span>सबसे अच्छा स्कोर · Best</span><b id="pBest">—</b></div>
+      <div class="row"><span>औसत स्कोर · Average</span><b id="pAvg">—</b></div>
+    </div>
+  </section>
+  <div class="resume" id="resume" hidden>
+    <div><b id="resumeText">Set 01 अधूरा है</b><div class="en">An exam is in progress. Its timer kept running while you were away.</div></div>
+    <div class="actions" style="margin:0">
+      <button class="btn danger" id="resumeDrop">Discard<small>छोड़ें</small></button>
+      <button class="btn primary" id="resumeGo">Resume Exam<small>परीक्षा जारी रखें</small></button>
+    </div>
+  </div>
+  <div class="sechead">
+    <h2>टेस्ट सेट चुनें <span class="en">· Choose a test set</span></h2>
+    <span class="en">सभी 272 प्रश्न 25 सेटों में बँटे हैं; हर प्रश्न 4–5 बार अलग क्रम में आता है।</span>
+  </div>
+  <div class="sets" id="sets"></div>
+  <p class="foot">स्रोत: बीमा परीक्षा के पूरे नोट्स (IC-38, हिंदी) · आपके स्कोर आपके खाते में सेव होते हैं।</p>
+</main>
+
+<!-- INSTRUCTIONS -->
+<main id="instr" class="wrap" hidden>
+  <div class="panel instr">
+    <h1 id="instrTitle">Set 01 — निर्देश</h1>
+    <div class="en">General Instructions · कृपया ध्यान से पढ़ें</div>
+    <ol>
+      <li>कुल <b>50 प्रश्न</b> हैं, हर प्रश्न 1 अंक का। समय <b>60 मिनट</b> है।</li>
+      <li>पास होने के लिए 50 में से कम से कम <b>18 सही</b> उत्तर चाहिए। ग़लत उत्तर पर नंबर नहीं कटते।</li>
+      <li>ऊपर दाईं ओर टाइमर चलता रहेगा। समय पूरा होते ही पेपर अपने आप जमा हो जाएगा।</li>
+      <li>विकल्प पर क्लिक करते ही उत्तर सेव हो जाता है। उसे बदल सकते हैं या <b>Clear Response</b> से हटा सकते हैं।</li>
+      <li>जिस प्रश्न पर दोबारा सोचना हो, उसे <b>Mark for Review</b> करें। चिह्नित प्रश्न का दिया हुआ उत्तर भी जाँचा जाएगा।</li>
+      <li>प्रश्न संख्या पर क्लिक करके किसी भी प्रश्न पर सीधे जा सकते हैं। कीबोर्ड पर 1–4 से विकल्प और → से अगला प्रश्न।</li>
+      <li>पेज बंद हो जाए तो दोबारा खोलने पर परीक्षा वहीं से जारी होगी, पर टाइमर रुकता नहीं।</li>
+    </ol>
+    <h3 style="margin:16px 0 4px;font-size:16px">प्रश्न पैलेट के रंग <span class="en">· Palette legend</span></h3>
+    <div class="legend">
+      <div><span class="q">1</span> नहीं देखा <span class="en">Not Visited</span></div>
+      <div><span class="q na">2</span> उत्तर नहीं दिया <span class="en">Not Answered</span></div>
+      <div><span class="q an">3</span> उत्तर दिया <span class="en">Answered</span></div>
+      <div><span class="q mr">4</span> समीक्षा हेतु चिह्नित <span class="en">Marked</span></div>
+      <div><span class="q am">5</span> उत्तर दिया + चिह्नित <span class="en">Answered & Marked</span></div>
+    </div>
+    <div class="field">
+      <label for="candName">उम्मीदवार का नाम <span class="en">· Candidate name</span></label>
+      <input id="candName" maxlength="40" placeholder="Enter your name" autocomplete="name">
+    </div>
+    <label class="check"><input type="checkbox" id="agree"> <span>मैंने सभी निर्देश पढ़ और समझ लिए हैं। <span class="en">I have read and understood the instructions.</span></span></label>
+    <div class="actions">
+      <button class="btn" id="instrBack">Back<small>वापस</small></button>
+      <button class="btn primary" id="startBtn" disabled>Start Exam<small>परीक्षा शुरू करें</small></button>
+    </div>
+  </div>
+</main>
+
+<!-- EXAM -->
+<div id="exam" class="wrap" hidden>
+  <div class="exam">
+    <section class="qpane" aria-live="polite">
+      <div class="qhead"><div class="qn" id="qn">प्रश्न 1</div><div class="tp" id="qtopic"></div></div>
+      <div class="qbody">
+        <p class="qtext" id="qtext"></p>
+        <ul class="opts" id="opts" role="radiogroup" aria-labelledby="qtext"></ul>
+      </div>
+      <div class="qfoot">
+        <div class="grp">
+          <button class="btn rev" id="markBtn">Mark for Review & Next<small>चिह्नित करें और आगे</small></button>
+          <button class="btn" id="clearBtn">Clear Response<small>उत्तर हटाएँ</small></button>
+        </div>
+        <div class="grp">
+          <button class="btn" id="prevBtn">Previous<small>पिछला</small></button>
+          <button class="btn ok" id="nextBtn">Save & Next<small>सहेजें और आगे</small></button>
+        </div>
+      </div>
+    </section>
+    <aside class="side" id="side" aria-label="Question palette">
+      <h3>प्रश्न पैलेट <span class="en">· Question Palette</span></h3>
+      <div class="counts" id="counts"></div>
+      <div class="grid" id="grid"></div>
+      <button class="btn primary" id="submitBtn">Submit Exam<small>परीक्षा जमा करें</small></button>
+    </aside>
+  </div>
+  <div class="scrim" id="scrim"></div>
+</div>
+
+<!-- RESULT -->
+<main id="result" class="wrap" hidden>
+  <div class="stack">
+    <section class="panel res-top">
+      <div class="score" id="scoreRing"><div><b id="scoreNum">0</b><span>/ 50</span></div></div>
+      <div>
+        <div class="en" id="resSet">Set 01 · Result</div>
+        <div class="verdict" id="verdict">PASS · उत्तीर्ण</div>
+        <div id="verdictNote" style="color:var(--muted)"></div>
+        <div class="stats" id="resStats"></div>
+        <div class="actions">
+          <button class="btn" id="resHome">All Sets<small>सभी सेट</small></button>
+          <button class="btn" id="resRetry">Retake This Set<small>यही सेट दोबारा</small></button>
+          <button class="btn primary" id="resNext">Next Set<small>अगला सेट</small></button>
+        </div>
+      </div>
+    </section>
+    <section class="panel">
+      <h2 style="margin:0 0 10px;font-size:18px">विषय-वार प्रदर्शन <span class="en">· Topic-wise performance</span></h2>
+      <div class="tablewrap"><table class="topics"><thead><tr><th>विषय · Topic</th><th style="text-align:right">सही / कुल</th><th>प्रतिशत</th></tr></thead><tbody id="topicRows"></tbody></table></div>
+    </section>
+    <section>
+      <div class="sechead" style="margin-top:0">
+        <h2>उत्तरों की समीक्षा <span class="en">· Answer review</span></h2>
+        <div class="filters" id="filters">
+          <button class="chip" data-f="all" aria-pressed="true">All · सभी</button>
+          <button class="chip" data-f="bad" aria-pressed="false">Wrong · ग़लत</button>
+          <button class="chip" data-f="skip" aria-pressed="false">Unanswered · खाली</button>
+          <button class="chip" data-f="ok" aria-pressed="false">Correct · सही</button>
+        </div>
+      </div>
+      <div class="rvlist" id="rvlist"></div>
+    </section>
+  </div>
+</main>
+
+<!-- MODALS -->
+<div class="modal" id="confirmModal" hidden role="dialog" aria-modal="true" aria-labelledby="cmTitle">
+  <div class="dialog">
+    <h3 id="cmTitle">परीक्षा जमा करें?</h3>
+    <div class="en">Submit the exam? You cannot change answers after submitting.</div>
+    <table id="cmTable"></table>
+    <div class="actions" style="justify-content:flex-end">
+      <button class="btn" id="cmNo">Go Back<small>वापस जाएँ</small></button>
+      <button class="btn primary" id="cmYes">Yes, Submit<small>हाँ, जमा करें</small></button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="timeModal" hidden role="dialog" aria-modal="true" aria-labelledby="tmTitle">
+  <div class="dialog">
+    <h3 id="tmTitle">समय समाप्त</h3>
+    <p style="margin:6px 0 14px">Time is up. आपका पेपर अपने आप जमा कर दिया गया है।</p>
+    <div class="actions" style="justify-content:flex-end"><button class="btn primary" id="tmOk">View Result<small>परिणाम देखें</small></button></div>
+  </div>
+</div>
+<div class="modal" id="dropModal" hidden role="dialog" aria-modal="true" aria-labelledby="dmTitle">
+  <div class="dialog">
+    <h3 id="dmTitle">अधूरी परीक्षा छोड़ें?</h3>
+    <p style="margin:6px 0 14px">Discard the unfinished exam? इसके उत्तर सेव नहीं होंगे।</p>
+    <div class="actions" style="justify-content:flex-end">
+      <button class="btn" id="dmNo">Keep It<small>रखें</small></button>
+      <button class="btn danger" id="dmYes">Discard<small>छोड़ें</small></button>
+    </div>
+  </div>
+</div>
+
+
+<div class="credit" id="credit">Created by – <b>Sandeep Kumar</b> · Sandeep Jan Seva Kendra · Mob. <a href="tel:+918299430081">8299430081</a></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

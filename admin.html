@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>IC-38 Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: owner console — navy bar, KPI strip, two data sheets (Users / Attempts) as tabbed tables */
+:root{--bg:#eef2f6;--surface:#fff;--surface-2:#f6f8fb;--ink:#16202e;--muted:#5a6678;--line:#d5dce5;--brand:#173a63;--brand-2:#22508a;--accent:#d99a1e;--ok:#1f8a4c;--ok-soft:#e3f4ea;--bad:#c8372d;--bad-soft:#fbe7e5;
+  --f-body:"Mukta","Noto Sans Devanagari",system-ui,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme: dark){:root{--bg:#0e151e;--surface:#16202c;--surface-2:#1b2735;--ink:#e6ecf3;--muted:#9aa8b9;--line:#2b3a4b;--brand:#14304f;--brand-2:#2a5c96;--ok:#3fb36f;--ok-soft:#163323;--bad:#e8675d;--bad-soft:#3a1d1b;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar{background:var(--brand);color:#fff}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding-block:8px;flex-wrap:wrap}
+.bar b{font-size:17px}
+button{font:inherit;cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:8px 14px;font-weight:600}
+.btn.primary{background:var(--brand-2);border-color:var(--brand-2);color:#fff}
+.btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
+main{padding-block:20px 40px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+.login{max-width:420px;margin:30px auto}
+.field{display:flex;flex-direction:column;gap:4px;margin:10px 0}
+.field input{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.msg{background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:8px 12px;margin:10px 0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi b{display:block;font-family:var(--f-mono);font-size:24px}
+.kpi span{color:var(--muted);font-size:13px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.tabs{display:flex;gap:6px;background:var(--surface-2);border-radius:9px;padding:4px}
+.tab{border:0;background:transparent;color:var(--muted);border-radius:7px;padding:7px 14px;font-weight:700}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.tools input{flex:1;min-width:200px;font:inherit;padding:8px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{position:sticky;top:0;background:var(--surface-2);font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+td.n{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:1px 9px}
+.pill.p{background:var(--ok-soft);color:var(--ok)}.pill.f{background:var(--bad-soft);color:var(--bad)}
+.muted{color:var(--muted)}
+.credit{text-align:center;color:var(--muted);font-size:12.5px;padding-block:16px}
+</style>
+</head>
+<body>
+<div class="bar"><div class="wrap"><b>IC-38 Mock Exam · Admin</b><button class="btn ghost" id="outBtn" hidden>Log out</button></div></div>
+
+<main class="wrap">
+  <section class="panel login" id="loginBox">
+    <h2 style="margin:0 0 4px">Admin login</h2>
+    <p class="muted" style="margin:0">Use the admin email set in firebase-config.js.</p>
+    <div id="lMsg" class="msg" hidden></div>
+    <form id="lForm">
+      <div class="field"><label for="aEmail">Email</label><input id="aEmail" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="aPass">Password</label><input id="aPass" type="password" autocomplete="current-password" required></div>
+      <button class="btn primary" type="submit" style="width:100%">Log in</button>
+    </form>
+  </section>
+
+  <section id="dash" hidden>
+    <div class="kpis" id="kpis"></div>
+    <div class="tools">
+      <div class="tabs" role="tablist">
+        <button class="tab" id="tUsers" aria-selected="true">Users (Sheet 1)</button>
+        <button class="tab" id="tAtt" aria-selected="false">Attempts (Sheet 2)</button>
+      </div>
+      <input id="q" type="search" placeholder="Search name, mobile or email">
+      <button class="btn" id="refresh">Refresh</button>
+      <button class="btn primary" id="csv">Download Excel (CSV)</button>
+    </div>
+    <div class="tablewrap"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+    <p class="muted" id="count" style="margin:8px 2px"></p>
+  </section>
+</main>
+<p class="credit">Created by – Sandeep Kumar · Sandeep Jan Seva Kendra · Mob. 8299430081</p>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+(function(){
+var $=function(id){return document.getElementById(id)};
+firebase.initializeApp(window.FIREBASE_CONFIG);
+var auth=firebase.auth(),db=firebase.firestore();
+var ADMINS=(window.ADMIN_EMAILS||[]).map(function(e){return e.toLowerCase()});
+var users=[],atts=[],view="users";
+
+function d(ts){if(!ts)return"";var x=ts.toDate?ts.toDate():new Date(ts);return x.toLocaleString("en-IN",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function err(t){$("lMsg").textContent=t;$("lMsg").hidden=!t}
+
+$("lForm").addEventListener("submit",function(e){e.preventDefault();err("");
+  auth.signInWithEmailAndPassword($("aEmail").value.trim(),$("aPass").value).catch(function(x){err("Login failed: "+(x.code||x.message))})});
+$("outBtn").addEventListener("click",function(){auth.signOut()});
+
+auth.onAuthStateChanged(function(u){
+  if(!u){$("loginBox").hidden=false;$("dash").hidden=true;$("outBtn").hidden=true;return}
+  if(ADMINS.indexOf((u.email||"").toLowerCase())<0){err("This account is not an admin.");auth.signOut();return}
+  if(!u.emailVerified){err("Verify this email first (open the main site, log in and verify), then try again.");auth.signOut();return}
+  $("loginBox").hidden=true;$("dash").hidden=false;$("outBtn").hidden=false;loadAll()});
+
+var COLS={
+  users:[["name","Name"],["mobile","Mobile"],["email","Email"],["dob","Date of birth"],["emailVerified","Email verified"],["attempts","Attempts"],["bestScore","Best score"],["lastScore","Last score"],["lastSet","Last set"],["createdAt","Registered on"],["lastLogin","Last login"]],
+  atts:[["createdAt","Date & time"],["name","Name"],["mobile","Mobile"],["email","Email"],["set","Set"],["score","Score /50"],["wrong","Wrong"],["skipped","Skipped"],["percent","%"],["result","Result"],["timeUsedSec","Time used"],["autoSubmitted","Time-up submit"]]
+};
+var NUM={attempts:1,bestScore:1,lastScore:1,lastSet:1,set:1,score:1,wrong:1,skipped:1,percent:1};
+function cell(k,v){
+  if(k==="createdAt"||k==="lastLogin")return d(v);
+  if(k==="emailVerified"||k==="autoSubmitted")return v?"Yes":"No";
+  if(k==="timeUsedSec")return v==null?"":Math.floor(v/60)+"m "+(v%60)+"s";
+  return v==null?"":v}
+
+function loadAll(){
+  $("count").textContent="Loading…";
+  Promise.all([db.collection("users").get(),db.collection("attempts").get()]).then(function(r){
+    users=[];r[0].forEach(function(x){users.push(Object.assign({uid:x.id},x.data()))});
+    atts=[];r[1].forEach(function(x){atts.push(x.data())});
+    var t=function(o,k){var v=o[k];return v&&v.toMillis?v.toMillis():(o.clientTime||0)};
+    users.sort(function(a,b){return t(b,"createdAt")-t(a,"createdAt")});
+    atts.sort(function(a,b){return t(b,"createdAt")-t(a,"createdAt")});
+    kpis();render();
+  }).catch(function(e){$("count").textContent="Could not load data: "+(e.code||e.message)+". Check firestore.rules admin email."})}
+
+function kpis(){
+  var today=new Date();today.setHours(0,0,0,0);
+  var newToday=users.filter(function(u){return u.createdAt&&u.createdAt.toMillis&&u.createdAt.toMillis()>=today.getTime()}).length;
+  var pass=atts.filter(function(a){return a.result==="PASS"}).length;
+  var avg=atts.length?(atts.reduce(function(s,a){return s+(a.score||0)},0)/atts.length).toFixed(1):"—";
+  $("kpis").innerHTML=[["Registered users",users.length],["New today",newToday],["Tests taken",atts.length],["Pass rate",atts.length?Math.round(pass/atts.length*100)+"%":"—"],["Average score",avg+(atts.length?" /50":"")]]
+    .map(function(k){return'<div class="kpi"><b>'+k[1]+'</b><span>'+k[0]+'</span></div>'}).join("")}
+
+function rows(){var q=$("q").value.trim().toLowerCase(),list=view==="users"?users:atts;
+  if(!q)return list;return list.filter(function(o){return[(o.name||""),(o.mobile||""),(o.email||"")].join(" ").toLowerCase().indexOf(q)>=0})}
+function render(){
+  var cols=COLS[view],list=rows();
+  $("th").innerHTML="<tr>"+cols.map(function(c){return"<th"+(NUM[c[0]]?' style="text-align:right"':"")+">"+c[1]+"</th>"}).join("")+"</tr>";
+  $("tb").innerHTML=list.map(function(o){return"<tr>"+cols.map(function(c){var v=cell(c[0],o[c[0]]);
+    if(c[0]==="result")return'<td><span class="pill '+(v==="PASS"?"p":"f")+'">'+esc(v)+"</span></td>";
+    return"<td"+(NUM[c[0]]?' class="n"':"")+">"+esc(v)+"</td>"}).join("")+"</tr>"}).join("")||'<tr><td class="muted" colspan="'+cols.length+'">No records yet.</td></tr>';
+  $("count").textContent=list.length+" record"+(list.length===1?"":"s")}
+
+function tab(v){view=v;$("tUsers").setAttribute("aria-selected",v==="users");$("tAtt").setAttribute("aria-selected",v==="atts");render()}
+$("tUsers").addEventListener("click",function(){tab("users")});
+$("tAtt").addEventListener("click",function(){tab("atts")});
+$("q").addEventListener("input",render);
+$("refresh").addEventListener("click",loadAll);
+$("csv").addEventListener("click",function(){
+  var cols=COLS[view],list=rows(),q=function(v){v=String(v==null?"":v);return'"'+v.replace(/"/g,'""')+'"'};
+  var lines=[cols.map(function(c){return q(c[1])}).join(",")].concat(list.map(function(o){return cols.map(function(c){var v=cell(c[0],o[c[0]]);
+    return q(v)}).join(",")}));
+  var blob=new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=(view==="users"?"ic38-users":"ic38-attempts")+"-"+new Date().toISOString().slice(0,10)+".csv";
+  document.body.appendChild(a);a.click();a.remove()});
+})();
+</script>
+</body>
+</html>
